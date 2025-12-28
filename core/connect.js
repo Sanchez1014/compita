@@ -10,8 +10,18 @@ const P = require('pino')
 const qrcode = require('qrcode-terminal')
 
 async function connectBot() {
-  const { state, saveCreds } =
-    await useMultiFileAuthState('./auth/session')
+  let state, saveCreds
+
+  if (process.env.SESSION_DATA) {
+    // Railway: leer sesión desde variable de entorno
+    state = JSON.parse(process.env.SESSION_DATA)
+    saveCreds = () => {} // no guarda nada porque ya está en env
+  } else {
+    // Local: usar carpeta auth/session
+    const auth = await useMultiFileAuthState('./auth/session')
+    state = auth.state
+    saveCreds = auth.saveCreds
+  }
 
   const { version } = await fetchLatestBaileysVersion()
 
@@ -40,9 +50,7 @@ async function connectBot() {
     }
 
     if (connection === 'close') {
-      const reason =
-        lastDisconnect?.error?.output?.statusCode
-
+      const reason = lastDisconnect?.error?.output?.statusCode
       if (reason === DisconnectReason.loggedOut) {
         console.log('❌ SESIÓN CERRADA — BORRA auth/session')
       } else {
