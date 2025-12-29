@@ -1,29 +1,26 @@
-const { prefix } = require('../../config')
+module.exports = async (sock, msg, args, isGroup) => {
+  const from = msg.key.remoteJid;
 
-module.exports = {
-  name: `${prefix}info`,
-
-  async execute(sock, msg) {
-    const from = msg.key.remoteJid;
-
-    const contactMessage = {
-      contacts: {
-        displayName: 'Sánchez',
-        contacts: [
-          {
-            vcard: `
+  const contactMessage = {
+    contacts: {
+      displayName: 'Miguel Sánchez',
+      contacts: [
+        {
+          vcard: `
 BEGIN:VCARD
 VERSION:3.0
 FN:Miguel Sánchez
-TEL;type=CELL;type=VOICE;waid=5219999999999:+1 818 674 3565
+TEL;type=CELL;type=VOICE;waid=18186743565:+1 818 674 3565
 END:VCARD
-            `.trim()
-          }
-        ]
-      }
-    };
+          `.trim()
+        }
+      ]
+    }
+  };
 
-    await sock.sendMessage(from, contactMessage);
-    await sock.sendMessage(from, { text: 'Contacto principal de Compita.' });
-  }
+  await sock.sendMessage(from, contactMessage);
+
+  await sock.sendMessage(from, {
+    text: '📞 Este es el contacto principal de Compita.'
+  });
 };
