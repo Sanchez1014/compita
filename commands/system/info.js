@@ -1,4 +1,4 @@
-module.exports = async (sock, msg, args, isGroup) => {
+module.exports = async (sock, msg) => {
   const from = msg.key.remoteJid;
 
   const contactMessage = {
@@ -21,6 +21,6 @@ END:VCARD
   await sock.sendMessage(from, contactMessage);
 
   await sock.sendMessage(from, {
-    text: '📞 Este es el contacto principal de Compita.'
+    text: 'Contacto principal de Compita.'
   });
 };
