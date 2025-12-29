@@ -6,12 +6,20 @@ module.exports = async (sock, msg) => {
     const from = msg.key.remoteJid
     const isGroup = from.endsWith('@g.us')
 
-    const body =
-      msg.message?.conversation ||
-      msg.message?.extendedTextMessage?.text ||
-      msg.message?.imageMessage?.caption ||
-      msg.message?.videoMessage?.caption
+    // Función para extraer texto de cualquier tipo de mensaje
+    const extract = m =>
+      m?.conversation ||
+      m?.extendedTextMessage?.text ||
+      m?.imageMessage?.caption ||
+      m?.videoMessage?.caption ||
+      m?.ephemeralMessage?.message?.extendedTextMessage?.text ||
+      m?.ephemeralMessage?.message?.conversation ||
+      m?.viewOnceMessage?.message?.extendedTextMessage?.text ||
+      m?.viewOnceMessage?.message?.conversation ||
+      m?.editedMessage?.message?.conversation ||
+      m?.protocolMessage?.conversation
 
+    const body = extract(msg.message)
     if (!body) return
     if (!body.startsWith(prefix)) return
 
@@ -28,7 +36,7 @@ module.exports = async (sock, msg) => {
     }
 
     await sock.sendMessage(from, {
-      text: '❌ Comando no encontrado. Usa *!menu*'
+      text: `❌ Comando no encontrado. Usa *${prefix}menu*`
     })
 
   } catch (err) {
